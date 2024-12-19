@@ -13,13 +13,15 @@ namespace BarcodeService.Controllers
     public class BarcodeController : Controller
     {
         /// <summary>
-        /// Generate barcode image from data 
+        /// Generate barcode image from parameters
         /// </summary>
         /// <param name="data"></param>
         /// <param name="code"></param>
+        /// <param name="rotate"></param>
+        /// <param name="pureBarcode"></param>
         /// <returns></returns>
         [HttpGet("GenerateBarcode")]
-        public IActionResult GenerateBarcode([FromQuery] string data, [FromQuery] string code = "code128")
+        public IActionResult GenerateBarcode([FromQuery] string data, [FromQuery] string code = "code128", [FromQuery] int rotate = 0, [FromQuery] bool pureBarcode = false)
         {
             if (string.IsNullOrWhiteSpace(data))
             {
@@ -38,31 +40,50 @@ namespace BarcodeService.Controllers
                 };
                 var barcodeWriter = new BarcodeWriter<Bitmap>
                 {
-                    Format = barcodeFormat, 
+                    Format = barcodeFormat,
                     Options = new ZXing.Common.EncodingOptions
                     {
-                        PureBarcode = false,
-                        Height = 150, 
-                        Width = 300,  
-                        Margin = 10   
+                        PureBarcode = pureBarcode,
+                        Height = 150,
+                        Width = 300,
+                        Margin = 10
                     },
                     Renderer = new BitmapRenderer()
                 };
 
                 Bitmap bitmap = barcodeWriter.Write(data);
+                
+
+                switch (rotate)
+                {
+                    case 90:
+                        bitmap.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                        break;
+                    case 180:
+                        bitmap.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                        break;
+                    case 270:
+                        bitmap.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                        break;
+                    default:
+                        bitmap.RotateFlip(RotateFlipType.RotateNoneFlipNone);
+                        break;
+                }
+
                 using (var ms = new MemoryStream())
                 {
-                    //bitmap.RotateFlip(RotateFlipType.Rotate270FlipX); //this can be taken as a parameter
+
+
                     bitmap.Save(ms, ImageFormat.Png);
-                    var base64String = Convert.ToBase64String(ms.ToArray()); 
+                    var base64String = Convert.ToBase64String(ms.ToArray());
                     return File(ms.ToArray(), "image/png");
                 }
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"One or more error occured: {ex.Message}");                
+                return StatusCode(500, $"One or more error occured: {ex.Message}");
             }
         }
-                
+
     }
 }
