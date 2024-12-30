@@ -21,7 +21,7 @@ namespace BarcodeService.Controllers
         /// <param name="pureBarcode"></param>
         /// <returns></returns>
         [HttpGet("GenerateBarcode")]
-        public IActionResult GenerateBarcode([FromQuery] string data, [FromQuery] string code = "code128", [FromQuery] int rotate = 0, [FromQuery] bool pureBarcode = false)
+        public IActionResult GenerateBarcode([FromQuery] string data, [FromQuery] string code = "code128", [FromQuery] int rotate = 0, [FromQuery] bool pureBarcode = false, [FromQuery] int width=400, [FromQuery] int height=200)
         {
             if (string.IsNullOrWhiteSpace(data))
             {
@@ -44,9 +44,10 @@ namespace BarcodeService.Controllers
                     Options = new ZXing.Common.EncodingOptions
                     {
                         PureBarcode = pureBarcode,
-                        Height = 150,
-                        Width = 300,
-                        Margin = 10
+                        Height = height,
+                        Width = width,
+                        Margin = 1,
+                        NoPadding=true
                     },
                     Renderer = new BitmapRenderer()
                 };

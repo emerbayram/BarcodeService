@@ -1,0 +1,6 @@
+﻿@BarcodeService_HostAddress = https://localhost:7221
+
+@data=string
+GET {{BarcodeService_HostAddress}}/barcode/GenerateBarcode?data={{data}}
+
+###
