@@ -28,6 +28,11 @@ namespace BarcodeService.Controllers
                 return BadRequest("Barcode value is required");
             }
 
+            if (width <= 0 || height <= 0)
+            {
+                return BadRequest("Width and height must be positive values.");
+            }
+
             try
             {
                 // default code128
